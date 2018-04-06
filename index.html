@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>SendGrid Test</title>
+
+  <style>
+    .card-section-left {
+      width: 145px;
+      display: inline-block;
+      text-align: center;
+      margin: 0 10px 0 20px;
+    }
+
+    .card-section-right {
+      width: 145px;
+      display: inline-block;
+    }
+
+    img {
+      width: 84px;
+    }
+
+    .img-flex-container {
+      display: flex;
+      align-items: center;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      width: 350px;
+      height: 206px;
+      display: inline-block;
+      box-shadow: 2px 3px 1px #a7a2a21a;
+      margin: 10px;
+      position: relative;
+    }
+
+    .card-contents-wrapper {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .company-catch-phrase {
+      font-style: italic;
+    }
+
+    .avatar-name {
+      color: #294762;
+      font-size: 13px;
+      font-family: OpenSans-Semibold;
+      line-height: 18px;
+    }
+
+    .avatar-email {
+      font-size: 12px;
+    }
+
+    #card-container {
+      display: flex;
+      justify-content: center;
+    }
+
+    #post-container {
+      width: 90%;
+      margin: 40px auto 80px auto;
+      padding: 40px 20px;
+    }
+
+    .post-title {
+      text-transform:capitalize;
+      color: #294762;
+      font-size: 20px;
+      font-family: OpenSans-Light;
+      line-height: 30px;
+    }
+
+    .post-body {
+      color: #294762;
+      font-size: 13px;
+      font-family: OpenSans-Light;
+      line-height: 20px;
+    }
+
+    .post {
+      margin-bottom: 30px;
+    }
+
+    #user-click-hint {
+      text-align: center;
+      padding: 20px 0;
+      margin-top: 20px;
+      box-shadow: 2px 3px 1px #a7a2a21a;
+    }
+
+  </style>
+</head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.5.15/dist/vue.js"></script>
+<body>
+<div id="app">
+  <div id="card-container">
+    <div
+      class="card"
+      v-for="(item, index) in randomlySelectedAvatars"
+      @click="getUniquePosts(item.id)"
+    >
+      <div class="card-contents-wrapper">
+        <div class="card-section-left">
+          <div class="img-flex-container">
+            <img :src="'https://api.adorable.io/avatars/150/'+item.email+'.png'">
+          </div>
+        </div>
+        <div class="card-section-right">
+          <p class="company-catch-phrase">"{{ item.company.catchPhrase }}"</p>
+          <span class="avatar-name">{{ item.name}}</span>
+          <small class="avatar-email">{{ item.email }}</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div
+    id="user-click-hint"
+    v-show="!selectedAvatarId"
+  >
+    <p>Click a card to view five of their posts</p>
+  </div>
+
+  <div id="post-container">
+    <div id="posts-container">
+      <div
+        class="post"
+        v-for="(post, index) in randomlySelectedAvatarPosts"
+      >
+        <div class="post-title">
+          {{ post.title }}
+        </div>
+        <div class="post-body">
+          {{ post.body }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  new Vue({
+    el: '#app',
+    data: {
+      randomlySelectedAvatars: [],
+      randomlySelectedAvatarPosts: [],
+      selectedAvatarId: null
+    },
+    created: function() {
+      $.ajax({
+        url: 'https://jsonplaceholder.typicode.com/users',
+        method: 'GET',
+        dataType: 'JSON',
+        success: (responseCollection) => {
+          this.randomlySelectedAvatars = this.getRandomItemsInCollection(responseCollection, 3);
+        }
+      });
+    },
+    methods: {
+      toTitleCase(string) {
+        return string.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();})
+      },
+      createRandomAvatarCards(avatarData) {
+        this.selectThreeAvatars(avatarData);
+      },
+      getUniquePosts(userId) {
+        if (this.selectedAvatarId === userId) {
+          return;
+        }
+
+        this.randomlySelectedAvatarPosts = [];
+        this.selectedAvatarId = userId;
+
+        $.ajax({
+          url: 'https://jsonplaceholder.typicode.com/posts?userId=' + userId,
+          method: 'GET',
+          dataType: 'JSON',
+          success: (responseCollection) => {
+            this.randomlySelectedAvatarPosts = this.getRandomItemsInCollection(responseCollection, 5);
+          }
+        });
+      },
+      getRandomItemsInCollection(responseCollection, limit){
+        let uniqueIndexArray = [];
+        let collection = [];
+
+        while (true) {
+          if (collection.length >= limit) {
+            break;
+          }
+
+          let highestPossibleIndex = responseCollection.length - 1;
+          let randomUniqueIndex = Math.floor(Math.random() * highestPossibleIndex) + 1;
+
+          if (! uniqueIndexArray.includes(randomUniqueIndex)) {
+            uniqueIndexArray.push(randomUniqueIndex);
+          }
+
+          collection.push(responseCollection[randomUniqueIndex]);
+        }
+
+        return collection;
+      }
+    }
+  });
+</script>
+<script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
+</body>
+</html>
