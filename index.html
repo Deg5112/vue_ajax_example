@@ -3,7 +3,6 @@
 <head>
   <meta charset="utf-8">
   <title>SendGrid Test</title>
-
   <style>
     .card-section-left {
       width: 145px;
@@ -94,7 +93,6 @@
       margin-top: 20px;
       box-shadow: 2px 3px 1px #a7a2a21a;
     }
-
   </style>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vue@2.5.15/dist/vue.js"></script>
@@ -115,7 +113,7 @@
         </div>
         <div class="card-section-right">
           <p class="company-catch-phrase">"{{ item.company.catchPhrase }}"</p>
-          <span class="avatar-name">{{ item.name}}</span>
+          <span class="avatar-name">{{ item.name }}</span>
           <small class="avatar-email">{{ item.email }}</small>
         </div>
       </div>
@@ -135,12 +133,8 @@
         class="post"
         v-for="(post, index) in randomlySelectedAvatarPosts"
       >
-        <div class="post-title">
-          {{ post.title }}
-        </div>
-        <div class="post-body">
-          {{ post.body }}
-        </div>
+        <div class="post-title">{{ post.title }}</div>
+        <div class="post-body">{{ post.body }}</div>
       </div>
     </div>
   </div>
